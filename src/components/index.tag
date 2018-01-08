@@ -1,3 +1,3 @@
 <blog>
-  <h1>Hello from Riot</h1>
+  <h1>Hello from Riotjs</h1>
 </blog>
