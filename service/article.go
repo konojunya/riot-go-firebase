@@ -1,19 +1,23 @@
 package service
 
 import (
+	. "os"
 	"strconv"
 
 	"github.com/JustinTulloss/firebase"
 	"github.com/konojunya/riot-go-firebase/model"
 )
 
-const (
-	endpoint = "https://riot-go-firebase.firebaseio.com"
-	auth     = "XFRU00YuHk9YOTh8dqgkAoMn1BDJsmGLhQMjRwFK"
+var (
+	endpoint string
+	auth     string
+	client   firebase.Client
 )
 
-func getClient() firebase.Client {
-	return firebase.NewClient(endpoint+"/foo", auth, nil)
+func init() {
+	endpoint = "https://riot-go-firebase.firebaseio.com"
+	auth = Getenv("FIREBASE_AUTH_TOKEN")
+	client = firebase.NewClient(endpoint+"/blog", auth, nil)
 }
 
 func articleAlloc() interface{} {
@@ -21,7 +25,6 @@ func articleAlloc() interface{} {
 }
 
 func GetArticleTitles() ([]string, error) {
-	client := getClient()
 	var titles []string
 
 	for n := range client.Iterator(articleAlloc) {
@@ -32,7 +35,6 @@ func GetArticleTitles() ([]string, error) {
 }
 
 func GetArticles() ([]model.Article, error) {
-	client := getClient()
 	var articles []model.Article
 
 	for n := range client.Iterator(articleAlloc) {
@@ -43,7 +45,6 @@ func GetArticles() ([]model.Article, error) {
 }
 
 func GetArticleById(id_str string) (*model.Article, error) {
-	client := getClient()
 	id, err := strconv.Atoi(id_str)
 	if err != nil {
 		return nil, err
@@ -60,7 +61,6 @@ func GetArticleById(id_str string) (*model.Article, error) {
 }
 
 func PostArticle(article *model.Article) error {
-	client := getClient()
 
 	client.Push(article, nil)
 
@@ -68,7 +68,6 @@ func PostArticle(article *model.Article) error {
 }
 
 func UpdateArticle(id_str string, article *model.Article) error {
-	client := getClient()
 	id, err := strconv.Atoi(id_str)
 	if err != nil {
 		return err
@@ -84,7 +83,6 @@ func UpdateArticle(id_str string, article *model.Article) error {
 }
 
 func DeleteArticle(id_str string) error {
-	client := getClient()
 	id, err := strconv.Atoi(id_str)
 	if err != nil {
 		return err
