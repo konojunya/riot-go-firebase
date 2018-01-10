@@ -4,9 +4,10 @@ RiotとGolangとFirebaseで超簡易的なブログをつくる
 
 ## 開発
 
-1. `npm install`
-2. `npm run build`
-3. `go run main.go`
+1. `cp .env.template .env`
+2. `npm install`
+3. `npm run build`
+4. `go run main.go`
 
 ## デプロイ
 
