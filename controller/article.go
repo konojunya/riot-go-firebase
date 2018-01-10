@@ -10,12 +10,13 @@ import (
 )
 
 func GetArticles(c *gin.Context) {
-	articles, err := service.GetArticles()
+	articleTitles, err := service.GetArticleTitles()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, nil)
 		return
 	}
-	c.JSON(http.StatusOK, articles)
+
+	c.JSON(http.StatusOK, articleTitles)
 }
 
 func GetArticleById(c *gin.Context) {

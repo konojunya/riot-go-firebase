@@ -21,6 +21,7 @@ func main() {
 
 	api := r.Group("/api")
 	api.GET("/articles", controller.GetArticles)
+	api.GET("/articles/:id", controller.GetArticleById)
 	api.POST("/articles", controller.PostArticle)
 	api.PUT("/articles/:id", controller.UpdateArticle)
 	api.DELETE("/articles/:id", controller.DeleteArticle)

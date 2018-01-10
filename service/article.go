@@ -20,6 +20,17 @@ func articleAlloc() interface{} {
 	return &model.Article{}
 }
 
+func GetArticleTitles() ([]string, error) {
+	client := getClient()
+	var titles []string
+
+	for n := range client.Iterator(articleAlloc) {
+		titles = append(titles, n.Value.(*model.Article).Title)
+	}
+
+	return titles, nil
+}
+
 func GetArticles() ([]model.Article, error) {
 	client := getClient()
 	var articles []model.Article
