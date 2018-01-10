@@ -1,62 +1,75 @@
 package controller
 
 import (
-	"log"
+	"net/http"
 
-	"github.com/JustinTulloss/firebase"
+	"github.com/gin-gonic/gin"
+
 	"github.com/konojunya/riot-go-firebase/model"
+	"github.com/konojunya/riot-go-firebase/service"
 )
 
-const (
-	endpoint = "https://riot-go-firebase.firebaseio.com"
-	auth     = "XFRU00YuHk9YOTh8dqgkAoMn1BDJsmGLhQMjRwFK"
-)
-
-func getClient() firebase.Client {
-	return firebase.NewClient(endpoint+"/foo", auth, nil)
+func GetArticles(c *gin.Context) {
+	articles, err := service.GetArticles()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, nil)
+		return
+	}
+	c.JSON(http.StatusOK, articles)
 }
 
-func articleAlloc() interface{} {
-	return &model.Article{}
-}
-
-func PostArticle(article *model.Article) {
-
-	client := getClient()
-
-	client.Push(article, nil)
-
-}
-
-func GetArticles() {
-
-	client := getClient()
-
-	for n := range client.Iterator(articleAlloc) {
-		log.Println(n.Value.(*model.Article).Title)
+func GetArticleById(c *gin.Context) {
+	id := c.Param("id")
+	article, err := service.GetArticleById(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, nil)
+		return
 	}
 
+	c.JSON(http.StatusOK, article)
 }
 
-func UpdateArticle(article *model.Article) {
+func PostArticle(c *gin.Context) {
+	title := c.PostForm("title")
+	text := c.PostForm("text")
 
-	client := getClient()
+	err := service.PostArticle(&model.Article{
+		Title: title,
+		Text:  text,
+	})
 
-	for n := range client.Iterator(articleAlloc) {
-		if n.Value.(*model.Article).Title == "テストタイトル" {
-			client.Update(n.Key, article, nil)
-		}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, nil)
+		return
 	}
+	c.JSON(http.StatusCreated, nil)
 }
 
-func DeleteArticle(id uint) {
+func UpdateArticle(c *gin.Context) {
+	id := c.Param("id")
+	title := c.PostForm("title")
+	text := c.PostForm("text")
 
-	client := getClient()
+	err := service.UpdateArticle(id, &model.Article{
+		Title: title,
+		Text:  text,
+	})
 
-	for n := range client.Iterator(articleAlloc) {
-		if n.Value.(*model.Article).ID == id {
-			client.Remove(n.Key, nil)
-		}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, nil)
+		return
 	}
 
+	c.AbortWithStatus(http.StatusNoContent)
+}
+
+func DeleteArticle(c *gin.Context) {
+	id := c.Param("id")
+	err := service.DeleteArticle(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, nil)
+		return
+	}
+
+	c.AbortWithStatus(http.StatusNoContent)
 }
